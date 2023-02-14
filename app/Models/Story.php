@@ -11,6 +11,7 @@ class Story extends Model
 
     protected $fillable = [
         'slug',
+        'tags',
         'title',
         'content',
         'editor_id',
