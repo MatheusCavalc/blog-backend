@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug', 2000);
             $table->string('tags');
+            $table->string('image')->nullable();
             $table->string('title');
             $table->longText('content');
             $table->integer('editor_id');

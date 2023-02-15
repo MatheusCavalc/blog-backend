@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreStoryRequest;
 use App\Http\Requests\UpdateStoryRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request as FacadesRequest;
 use App\Models\Story;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -63,16 +64,34 @@ class StoryController extends Controller
         $slug = Str::slug($request->get('title'), '-');
         $request->request->add(['slug' => $slug]);
 
+        //if ($request->hasFile('image')) {
+        //    $image = $request->file('image');
+        //    $filename = time() . $slug . '.' . $image->getClientOriginalExtension();
+        //    $request->image->move(public_path('storage/image'), $filename);
+        //    $request->merge(['image' => $filename]);
+        //    //$request->request->add(['image' => $filename]);
+        //}
+
         $response = [];
         $validation = $this->validation($request->all());
         if (!is_array($validation)) {
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = time() . $slug . '.' . $image->getClientOriginalExtension();
+                $request->image->move(public_path('storage/image'), $filename);
+                $requestData = $request->all();
+                $requestData['image'] = $filename;
+                Story::create($requestData);
+                array_push($response, ['status' => 'success']);
+                return response()->json($response, 200);
+            }
+
             Story::create($request->all());
             array_push($response, ['status' => 'success']);
             return response()->json($response, 200);
         } else {
             return response()->json($validation, 400);
         }
-
     }
 
     /**
@@ -168,6 +187,7 @@ class StoryController extends Controller
         ];
         $attributes = [
             'slug' => 'slug',
+            'tags' => 'tags',
             'title' => 'title',
             'content' => 'content',
             'editor_id' => 'editor_id',
@@ -177,6 +197,7 @@ class StoryController extends Controller
             $params,
             [
                 'slug' => 'required',
+                'tags' => 'required',
                 'title' => 'required|max:80',
                 'content' => 'required',
                 'editor_id' => 'required|max:5000',
