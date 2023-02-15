@@ -17,11 +17,9 @@ class LoginController extends Controller
 
         return response()->json([
             'data' => [
+                'token' => $token->plainTextToken,
                 'user_name' => auth()->user()->name,
-                'user_email' => auth()->user()->email,
-                'user_write' => auth()->user()->can_write,
-                'user_id' => auth()->user()->id,
-                'token' => $token->plainTextToken
+                //'user_email' => auth()->user()->email,
             ]
         ]);
     }

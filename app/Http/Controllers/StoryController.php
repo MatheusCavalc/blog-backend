@@ -41,36 +41,10 @@ class StoryController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        $story = Story::create([
-            'title' => $request->get('email'),
-            'content' => $request->get('name'),
-            'editor_id' => $request->get('editor_id'),
-            'editor_name' => $request->get('editor_name')
-        ]);
-
-        if ($story) {
-            return response()->json([
-                'status' => 'success'
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => 'error'
-            ]);
-        }
-        */
-
-
         $slug = Str::slug($request->get('title'), '-');
         $request->request->add(['slug' => $slug]);
-
-        //if ($request->hasFile('image')) {
-        //    $image = $request->file('image');
-        //    $filename = time() . $slug . '.' . $image->getClientOriginalExtension();
-        //    $request->image->move(public_path('storage/image'), $filename);
-        //    $request->merge(['image' => $filename]);
-        //    //$request->request->add(['image' => $filename]);
-        //}
+        $request->request->add(['editor_id' => auth()->user()->id]);
+        $request->request->add(['editor_name' => auth()->user()->name]);
 
         $response = [];
         $validation = $this->validation($request->all());
@@ -89,6 +63,7 @@ class StoryController extends Controller
             Story::create($request->all());
             array_push($response, ['status' => 'success']);
             return response()->json($response, 200);
+
         } else {
             return response()->json($validation, 400);
         }
