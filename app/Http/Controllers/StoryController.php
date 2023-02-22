@@ -19,7 +19,7 @@ class StoryController extends Controller
      */
     public function index()
     {
-        $stories = Story::all();
+        $stories = Story::orderBy('id', 'desc')->get();
         return response()->json($stories, 200);
     }
 
