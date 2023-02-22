@@ -13,6 +13,8 @@ class Story extends Model
         'slug',
         'tags',
         'image',
+        'title_preview',
+        'content_preview',
         'title',
         'content',
         'editor_id',

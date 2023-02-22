@@ -165,6 +165,8 @@ class StoryController extends Controller
             'tags' => 'tags',
             'title' => 'title',
             'content' => 'content',
+            'title_preview' => 'title_preview',
+            'content_preview' => 'content_preview',
             'editor_id' => 'editor_id',
             'editor_name' => 'editor_name',
         ];
@@ -175,6 +177,8 @@ class StoryController extends Controller
                 'tags' => 'required',
                 'title' => 'required|max:80',
                 'content' => 'required',
+                'title_preview' => 'required|max:100',
+                'content_preview' => 'required|max:140',
                 'editor_id' => 'required|max:5000',
                 'editor_name' => 'required|max:25'
             ],
