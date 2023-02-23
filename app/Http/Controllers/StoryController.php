@@ -43,8 +43,12 @@ class StoryController extends Controller
     {
         $slug = Str::slug($request->get('title'), '-');
         $request->request->add(['slug' => $slug]);
+
         $request->request->add(['editor_id' => auth()->user()->id]);
         $request->request->add(['editor_name' => auth()->user()->name]);
+
+        $requestData = $request->all();
+        $requestData['tags'] = explode(',', $request->get('tags'));
 
         $response = [];
         $validation = $this->validation($request->all());
@@ -53,14 +57,13 @@ class StoryController extends Controller
                 $image = $request->file('image');
                 $filename = time() . $slug . '.' . $image->getClientOriginalExtension();
                 $request->image->move(public_path('storage/image'), $filename);
-                $requestData = $request->all();
                 $requestData['image'] = $filename;
                 Story::create($requestData);
                 array_push($response, ['status' => 'success']);
                 return response()->json($response, 200);
             }
 
-            Story::create($request->all());
+            Story::create($requestData);
             array_push($response, ['status' => 'success']);
             return response()->json($response, 200);
 
