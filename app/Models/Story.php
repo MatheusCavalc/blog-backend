@@ -17,7 +17,7 @@ class Story extends Model
         'content_preview',
         'title',
         'content',
-        'editor_id',
+        'user_id',
         'editor_name'
     ];
 
@@ -29,4 +29,9 @@ class Story extends Model
     protected $casts = [
         'tags' => 'array',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('stories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('slug', 2000);
             $table->string('tags');
             $table->string('image')->nullable();
@@ -22,7 +23,6 @@ return new class extends Migration
             $table->string('content_preview');
             $table->string('title');
             $table->longText('content');
-            $table->integer('editor_id');
             $table->string('editor_name');
             $table->timestamps();
         });

@@ -7,8 +7,10 @@ use App\Http\Requests\UpdateStoryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use App\Models\Story;
+use App\Models\Follower;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class StoryController extends Controller
 {
@@ -20,6 +22,31 @@ class StoryController extends Controller
     public function index()
     {
         $stories = Story::orderBy('id', 'desc')->get();
+        return response()->json($stories, 200);
+    }
+
+    public function following()
+    {
+        //id from auth user
+        $id = auth()->user()->id;
+
+        //ids que o auth user segue
+        $ids_follow = Follower::where('follower_user_id', $id)->get();
+
+        // tranformando valores em string para array para consulta
+        $content = '';
+        foreach ($ids_follow as $a) {
+            $content .= $a->user_id . ',';
+        }
+        $array_follow = explode(',', $content);
+
+        //consulta
+        $stories = DB::table('stories')
+            ->whereIn('user_id', $array_follow)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        //retorno
         return response()->json($stories, 200);
     }
 
@@ -44,7 +71,7 @@ class StoryController extends Controller
         $slug = Str::slug($request->get('title'), '-');
         $request->request->add(['slug' => $slug]);
 
-        $request->request->add(['editor_id' => auth()->user()->id]);
+        $request->request->add(['user_id' => auth()->user()->id]);
         $request->request->add(['editor_name' => auth()->user()->name]);
 
         $requestData = $request->all();
@@ -66,7 +93,6 @@ class StoryController extends Controller
             Story::create($requestData);
             array_push($response, ['status' => 'success']);
             return response()->json($response, 200);
-
         } else {
             return response()->json($validation, 400);
         }
@@ -80,7 +106,20 @@ class StoryController extends Controller
      */
     public function show(Story $story)
     {
-        return response()->json($story, 200);
+        $id = auth()->user()->id;
+
+        $ids_follow = Follower::where('follower_user_id', $id)->where('user_id', $story->user_id)->exists();
+
+        if ($ids_follow) {
+            $follow = true;
+        } else {
+            $follow = false;
+        }
+
+        return response()->json([
+            'story' => $story,
+            'is_follow' => $follow
+        ]);
     }
 
     /**
@@ -170,7 +209,7 @@ class StoryController extends Controller
             'content' => 'content',
             'title_preview' => 'title_preview',
             'content_preview' => 'content_preview',
-            'editor_id' => 'editor_id',
+            'user_id' => 'user_id',
             'editor_name' => 'editor_name',
         ];
         $validation = Validator::make(
@@ -182,7 +221,7 @@ class StoryController extends Controller
                 'content' => 'required',
                 'title_preview' => 'required|max:100',
                 'content_preview' => 'required|max:140',
-                'editor_id' => 'required|max:5000',
+                'user_id' => 'required|max:5000',
                 'editor_name' => 'required|max:25'
             ],
             $messages,
