@@ -110,6 +110,8 @@ class StoryController extends Controller
 
         $ids_follow = Follower::where('follower_user_id', $id)->where('user_id', $story->user_id)->exists();
 
+        $can_follow = $id == $story->user_id ? false : true;
+
         if ($ids_follow) {
             $follow = true;
         } else {
@@ -118,7 +120,8 @@ class StoryController extends Controller
 
         return response()->json([
             'story' => $story,
-            'is_follow' => $follow
+            'is_follow' => $follow,
+            'can_follow' => $can_follow
         ]);
     }
 
