@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\Api\LoginController;
 use App\Http\Controllers\Auth\Api\RegisterController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -41,5 +42,9 @@ Route::get('following', [StoryController::class, 'following'])->middleware('auth
 
 Route::post('/follows', [UserController::class, 'follows'])->middleware('auth:sanctum');
 Route::post('/unfollows', [UserController::class, 'unfollows'])->middleware('auth:sanctum');
+
+Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth:sanctum');
+Route::get('/user/settings', [ProfileController::class, 'settings'])->middleware('auth:sanctum');
+Route::post('/user/update', [ProfileController::class, 'updateInfos'])->middleware('auth:sanctum');
 
 Route::get('image/{path}', [ImageController::class, 'getImage'])->where('path', '.*');
