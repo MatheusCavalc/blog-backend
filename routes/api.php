@@ -33,11 +33,9 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::apiResource('stories', StoryController::class)
-    ->only(['index']);
-
-Route::apiResource('stories', StoryController::class)
-    ->only(['store', 'show', 'update', 'destroy'])
+    ->only(['index', 'store', 'show', 'update', 'destroy'])
     ->middleware('auth:sanctum');
+
 Route::get('following', [StoryController::class, 'following'])->middleware('auth:sanctum');
 
 Route::post('/follows', [UserController::class, 'follows'])->middleware('auth:sanctum');
@@ -46,5 +44,7 @@ Route::post('/unfollows', [UserController::class, 'unfollows'])->middleware('aut
 Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth:sanctum');
 Route::get('/user/settings', [ProfileController::class, 'settings'])->middleware('auth:sanctum');
 Route::post('/user/update', [ProfileController::class, 'updateInfos'])->middleware('auth:sanctum');
+
+Route::get('/{username}', [UserController::class, 'userPage'])->middleware('auth:sanctum');
 
 Route::get('image/{path}', [ImageController::class, 'getImage'])->where('path', '.*');

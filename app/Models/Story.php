@@ -30,8 +30,8 @@ class Story extends Model
         'tags' => 'array',
     ];
 
-    public function user()
+    public function author()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 }

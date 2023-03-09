@@ -46,7 +46,7 @@ class User extends Authenticatable
 
     public function stories()
     {
-        return $this->hasMany(Story::class);
+        return $this->hasMany(Story::class, 'user_id', 'id');
     }
 
     public function following()

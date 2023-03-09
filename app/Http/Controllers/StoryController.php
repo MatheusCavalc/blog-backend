@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use App\Models\Story;
 use App\Models\Follower;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -21,8 +22,14 @@ class StoryController extends Controller
      */
     public function index()
     {
-        $stories = Story::orderBy('id', 'desc')->get();
-        return response()->json($stories, 200);
+        $id = auth()->user()->id;
+
+        $stories = Story::with('author')->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'id' => $id,
+            'stories' => $stories
+        ], 200);
     }
 
     public function following()
@@ -42,8 +49,10 @@ class StoryController extends Controller
 
         //consulta
         $stories = DB::table('stories')
-            ->whereIn('user_id', $array_follow)
-            ->orderBy('id', 'desc')
+            ->whereIn('stories.user_id', $array_follow)
+            ->orderBy('stories.id', 'desc')
+            ->select('stories.id', 'stories.created_at', 'stories.slug', 'stories.title_preview', 'stories.content_preview', 'stories.image', 'stories.tags', 'users.username', 'users.name')
+            ->join('users', 'users.id', '=', 'stories.user_id')
             ->get();
 
         //retorno
@@ -108,6 +117,8 @@ class StoryController extends Controller
     {
         $id = auth()->user()->id;
 
+        $user = User::select('id', 'name', 'username', 'bio')->where('id', $story->user_id)->first();
+
         $ids_follow = Follower::where('follower_user_id', $id)->where('user_id', $story->user_id)->exists();
 
         $can_follow = $id == $story->user_id ? false : true;
@@ -119,6 +130,8 @@ class StoryController extends Controller
         }
 
         return response()->json([
+            'authId' => $id,
+            'user' => $user,
             'story' => $story,
             'is_follow' => $follow,
             'can_follow' => $can_follow
