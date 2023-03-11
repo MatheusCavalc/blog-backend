@@ -33,7 +33,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::apiResource('stories', StoryController::class)
-    ->only(['index', 'store', 'show', 'update', 'destroy'])
+    ->only(['index', 'store', 'show', 'edit', 'update', 'destroy'])
     ->middleware('auth:sanctum');
 
 Route::get('following', [StoryController::class, 'following'])->middleware('auth:sanctum');

@@ -146,7 +146,17 @@ class StoryController extends Controller
      */
     public function edit(Story $story)
     {
-        //
+        $id = auth()->user()->id;
+
+        if ($id == $story->user_id) {
+            return response()->json([
+                'story' => $story
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'Unauthorized'
+        ]);
     }
 
     /**
@@ -156,18 +166,17 @@ class StoryController extends Controller
      * @param  \App\Models\Story  $story
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateStoryRequest $request, Story $story)
+    public function update(Request $request, Story $story)
     {
-        $story->user->update([
-            'title' => $request->get('email'),
-            'content' => $request->get('name'),
-            'editor_id' => $request->get('editor_id'),
-            'editor_name' => $request->get('editor_name')
+        $story->update([
+            'title' => $request->get('title'),
+            'content' => $request->get('content'),
         ]);
 
         if ($story) {
             return response()->json([
-                'status' => 'success'
+                'status' => 'success',
+                'redirect' => $story->slug . '/' . $story->id
             ], 200);
         } else {
             return response()->json([
@@ -202,12 +211,12 @@ class StoryController extends Controller
      */
     public function destroy(Story $story)
     {
-        if ($story->id === auth()->user()->id) {
-            $story->delete();
-            return response()->json([
-                'status' => 'success',
-                "message" => "Story deleted"
-            ], 202);
+        if ($story->user_id === auth()->user()->id) {
+        $story->delete();
+        return response()->json([
+            'status' => 'success',
+            "message" => "Story deleted"
+        ], 202);
         }
     }
 
